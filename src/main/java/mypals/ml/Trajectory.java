@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -45,9 +46,9 @@ public class Trajectory implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+		HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
 			if(showInfo)
-				drawContext.drawText(MinecraftClient.getInstance().textRenderer, "Predicted landing site: x:" + String.format("%.1f", hitPoint.x).formatted(Formatting.RED) + " y:"+ String.format("%.1f", hitPoint.y).formatted(Formatting.GREEN) +" z:"+String.format("%.1f", hitPoint.z).formatted(Formatting.BLUE), 2, 2, 0xFFFFFF, false);
+				DrawableHelper.drawTextWithShadow(matrixStack, MinecraftClient.getInstance().textRenderer, "Predicted landing site: x:" + String.format("%.1f", hitPoint.x).formatted(Formatting.RED) + " y:"+ String.format("%.1f", hitPoint.y).formatted(Formatting.GREEN) +" z:"+String.format("%.1f", hitPoint.z).formatted(Formatting.BLUE), 2, 2, 0xFFFFFF);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (client.world != null && client.player != null) {
@@ -337,10 +338,8 @@ public class Trajectory implements ModInitializer {
 		projectilesStrate.addAll(world.getEntitiesByType(EntityType.FIREBALL, searchBox, entity -> true));
 		projectilesStrate.addAll(world.getEntitiesByType(EntityType.DRAGON_FIREBALL, searchBox, entity -> true));
 		projectilesStrate.addAll(world.getEntitiesByType(EntityType.SMALL_FIREBALL, searchBox, entity -> true));
-		projectilesStrate.addAll(world.getEntitiesByType(EntityType.WIND_CHARGE, searchBox, entity -> true));
 		projectilesStrate.addAll(world.getEntitiesByType(EntityType.WITHER_SKULL, searchBox, entity -> true));
 		projectilesStrate.addAll(world.getEntitiesByType(EntityType.SHULKER_BULLET, searchBox, entity -> true));
-		projectilesStrate.addAll(world.getEntitiesByType(EntityType.BREEZE_WIND_CHARGE, searchBox, entity -> true));
 
 		for (Entity projectile : projectilesSimple) {
 			List<Vec3d> points = calculateTrajectoryForEntity(particleHit, projectile, world, 0.03f, 0.99f);
